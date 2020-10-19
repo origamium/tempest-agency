@@ -10,7 +10,7 @@ const TEST_KEY = process.env.TEST_KEY;
 
 const tweet = (): FastifyInstance => {
     const app = fastify({ logger: true });
-    app.get("/", async (req, res) => {
+    app.get("/api/tweet", async (req, res) => {
         const { code } = req.query as { code: string };
         if (code === TEST_KEY) {
             const oauth = new oauth1a({
