@@ -46,7 +46,7 @@ const tweet = (): FastifyInstance => {
             });
 
             res.status(200);
-            res.send(await result.json());
+            res.send(await result.text());
         } else {
             res.status(400);
             res.send("bad request");
