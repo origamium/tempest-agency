@@ -1,0 +1,8 @@
+{
+    "version": 2,
+    "functions": {
+        "api/tweet.ts": {
+            "maxDuration": 3
+        }
+    }
+}
