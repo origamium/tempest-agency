@@ -12,7 +12,7 @@ const tweet = (): FastifyInstance => {
     const app = fastify({ logger: true });
     app.get("/", async (req, res) => {
         const { code } = req.query as { code: string };
-        if (code) {
+        if (code === TEST_KEY) {
             const oauth = new oauth1a({
                 consumer: {
                     key: TWITTER_CLIENT_ID ?? "",
@@ -28,7 +28,7 @@ const tweet = (): FastifyInstance => {
             return oauth.authorize({
                 url: "https://api.twitter.com",
                 method: "POST",
-                data: { oauth_callback: "" },
+                data: { oauth_callback: "https://tempest-client.now.sh/" },
             });
         }
 
