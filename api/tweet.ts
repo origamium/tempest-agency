@@ -25,15 +25,31 @@ const tweet = (): FastifyInstance => {
             });
 
             // WARN: やばいかも
-            return oauth.authorize({
-                url: "https://api.twitter.com",
+            const oauth_data = oauth.authorize({
+                url: "https://api.twitter.com/request_token",
                 method: "POST",
                 data: { oauth_callback: "https://tempest-client.now.sh/" },
             });
-        }
 
-        res.status(400);
-        res.send("bad request");
+            const result = await fetch("https://api.twitter.com/request_token", {
+                headers: {
+                    Authorization:
+                        `OAuth oauth_consumer_key="${oauth_data.oauth_consumer_key}",` +
+                        `oauth_signature_method="${oauth_data.oauth_signature_method}",` +
+                        `oauth_timestamp="${oauth_data.oauth_timestamp}",` +
+                        `oauth_nonce="${oauth_data.oauth_nonce}",` +
+                        `oauth_version="${oauth_data.oauth_version}",` +
+                        `oauth_signature="${oauth_data.oauth_signature}"`,
+                },
+                body: JSON.stringify({ oauth_callback: "https://tempest-client.now.sh/" }),
+            });
+
+            res.status(200);
+            res.send(await result.json());
+        } else {
+            res.status(400);
+            res.send("bad request");
+        }
     });
 
     return app;
