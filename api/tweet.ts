@@ -31,7 +31,7 @@ const tweet = (): FastifyInstance => {
                 data: { oauth_callback: "https://tempest-client.now.sh/" },
             });
 
-            const result = await fetch("https://api.twitter.com/request_token", {
+            const result = await fetch("https://api.twitter.com/oauth/request_token", {
                 method: "POST",
                 headers: {
                     Authorization:
