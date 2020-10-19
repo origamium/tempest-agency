@@ -32,6 +32,7 @@ const tweet = (): FastifyInstance => {
             });
 
             const result = await fetch("https://api.twitter.com/request_token", {
+                method: "POST",
                 headers: {
                     Authorization:
                         `OAuth oauth_consumer_key="${oauth_data.oauth_consumer_key}",` +
