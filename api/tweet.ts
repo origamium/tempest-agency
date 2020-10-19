@@ -1,6 +1,6 @@
 import { NowRequest, NowResponse } from "@now/node";
 import fastify, { FastifyInstance } from "fastify";
-import fetch from "node-fetch";
+import fetch, { Headers } from "node-fetch";
 import oauth1a from "oauth-1.0a";
 import crypto from "crypto-js";
 
@@ -10,6 +10,7 @@ const TEST_KEY = process.env.TEST_KEY;
 
 const oauth_callback = "https://tempest-client.now.sh/";
 
+// OAuth oauth_consumer_key="teMvsH7tcmvrJSbKNJvOTIKsc",oauth_signature_method="HMAC-SHA1",oauth_timestamp="1603105032",oauth_nonce="yeah",oauth_version="1.0",oauth_callback="https%3A%2F%2Ftempest-client.now.sh%2F",oauth_signature="cHdbRmE08oUETQjfPKogNA3YOSY%3D"
 const tweet = (): FastifyInstance => {
     const app = fastify({ logger: true });
     app.get("/api/tweet", async (req, res) => {
@@ -26,26 +27,30 @@ const tweet = (): FastifyInstance => {
                 },
             });
 
-            // WARN: やばいかも
             const oauth_data = oauth.authorize({
                 url: "https://api.twitter.com/oauth/request_token",
                 method: "POST",
                 data: { oauth_callback },
             });
 
+            const headers = new Headers();
+            headers.append(
+                "Authorization",
+                `OAuth oauth_consumer_key="${oauth_data.oauth_consumer_key}",` +
+                    `oauth_signature_method="${oauth_data.oauth_signature_method}",` +
+                    `oauth_timestamp="${oauth_data.oauth_timestamp}",` +
+                    `oauth_nonce="${oauth_data.oauth_nonce}",` +
+                    `oauth_version="${oauth_data.oauth_version}",` +
+                    `oauth_signature="${oauth_data.oauth_signature}"` +
+                    `oauth_callback=${encodeURI(oauth_callback)}`
+            );
+
+            console.log(headers.get("Authorization"));
+
             const result = await fetch("https://api.twitter.com/oauth/request_token", {
                 method: "POST",
-                headers: {
-                    Authorization:
-                        `OAuth oauth_consumer_key="${oauth_data.oauth_consumer_key}",` +
-                        `oauth_signature_method="${oauth_data.oauth_signature_method}",` +
-                        `oauth_timestamp="${oauth_data.oauth_timestamp}",` +
-                        `oauth_nonce="${oauth_data.oauth_nonce}",` +
-                        `oauth_version="${oauth_data.oauth_version}",` +
-                        `oauth_signature="${oauth_data.oauth_signature}" ` +
-                        `oauth_callback=${encodeURI(oauth_callback)}`,
-                },
                 body: JSON.stringify({ oauth_callback }),
+                headers,
             });
 
             res.status(200);
