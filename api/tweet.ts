@@ -28,7 +28,7 @@ const tweet = (): FastifyInstance => {
 
             // WARN: やばいかも
             const oauth_data = oauth.authorize({
-                url: "https://api.twitter.com/request_token",
+                url: "https://api.twitter.com/oauth/request_token",
                 method: "POST",
                 data: { oauth_callback },
             });
