@@ -10,7 +10,6 @@ const TEST_KEY = process.env.TEST_KEY;
 
 const oauth_callback = "https://tempest-client.now.sh/";
 
-// OAuth oauth_consumer_key="teMvsH7tcmvrJSbKNJvOTIKsc",oauth_signature_method="HMAC-SHA1",oauth_timestamp="1603105032",oauth_nonce="yeah",oauth_version="1.0",oauth_callback="https%3A%2F%2Ftempest-client.now.sh%2F",oauth_signature="cHdbRmE08oUETQjfPKogNA3YOSY%3D"
 const tweet = (): FastifyInstance => {
     const app = fastify({ logger: true });
     app.get("/api/tweet", async (req, res) => {
@@ -23,29 +22,22 @@ const tweet = (): FastifyInstance => {
                 },
                 signature_method: "HMAC-SHA1",
                 hash_function(base_string, key) {
-                    return crypto.HmacSHA1(base_string, key).toString(crypto.enc.Base64);
+                    return crypto
+                        .HmacSHA1(base_string, `${encodeURIComponent(TWITTER_CLIENT_SECRET)}&`)
+                        .toString(crypto.enc.Base64);
                 },
             });
 
-            const oauth_data = oauth.authorize({
-                url: "https://api.twitter.com/oauth/request_token",
-                method: "POST",
-                data: { oauth_callback },
-            });
-
-            const headers = new Headers();
-            headers.append(
-                "Authorization",
-                `OAuth oauth_consumer_key="${oauth_data.oauth_consumer_key}",` +
-                    `oauth_signature_method="${oauth_data.oauth_signature_method}",` +
-                    `oauth_timestamp="${oauth_data.oauth_timestamp}",` +
-                    `oauth_nonce="${oauth_data.oauth_nonce}",` +
-                    `oauth_version="${oauth_data.oauth_version}",` +
-                    `oauth_signature="${oauth_data.oauth_signature}"` +
-                    `oauth_callback=${encodeURI(oauth_callback)}`
+            const oauth_data = oauth.toHeader(
+                oauth.authorize({
+                    url: "https://api.twitter.com/oauth/request_token",
+                    method: "POST",
+                    data: { oauth_callback },
+                })
             );
 
-            console.log(headers.get("Authorization"));
+            const headers = new Headers();
+            headers.append("Authorization", oauth_data.Authorization);
 
             const result = await fetch("https://api.twitter.com/oauth/request_token", {
                 method: "POST",
