@@ -36,15 +36,14 @@ const tweet = (): FastifyInstance => {
             const result = await fetch("https://api.twitter.com/oauth/request_token", {
                 method: "POST",
                 headers: {
-                    Authorization: encodeURI(
+                    Authorization:
                         `OAuth oauth_consumer_key="${oauth_data.oauth_consumer_key}",` +
-                            `oauth_signature_method="${oauth_data.oauth_signature_method}",` +
-                            `oauth_timestamp="${oauth_data.oauth_timestamp}",` +
-                            `oauth_nonce="${oauth_data.oauth_nonce}",` +
-                            `oauth_version="${oauth_data.oauth_version}",` +
-                            `oauth_signature="${oauth_data.oauth_signature}" ` +
-                            `oauth_callback=${oauth_callback}`
-                    ),
+                        `oauth_signature_method="${oauth_data.oauth_signature_method}",` +
+                        `oauth_timestamp="${oauth_data.oauth_timestamp}",` +
+                        `oauth_nonce="${oauth_data.oauth_nonce}",` +
+                        `oauth_version="${oauth_data.oauth_version}",` +
+                        `oauth_signature="${oauth_data.oauth_signature}" ` +
+                        `oauth_callback=${encodeURI(oauth_callback)}`,
                 },
                 body: JSON.stringify({ oauth_callback }),
             });
