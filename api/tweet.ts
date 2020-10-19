@@ -8,6 +8,8 @@ const TWITTER_CLIENT_ID = process.env.TWITTER_CLIENT_ID;
 const TWITTER_CLIENT_SECRET = process.env.TWITTER_CLIENT_SECRET;
 const TEST_KEY = process.env.TEST_KEY;
 
+const oauth_callback = "https://tempest-client.now.sh/";
+
 const tweet = (): FastifyInstance => {
     const app = fastify({ logger: true });
     app.get("/api/tweet", async (req, res) => {
@@ -28,21 +30,23 @@ const tweet = (): FastifyInstance => {
             const oauth_data = oauth.authorize({
                 url: "https://api.twitter.com/request_token",
                 method: "POST",
-                data: { oauth_callback: "https://tempest-client.now.sh/" },
+                data: { oauth_callback },
             });
 
             const result = await fetch("https://api.twitter.com/oauth/request_token", {
                 method: "POST",
                 headers: {
-                    Authorization:
+                    Authorization: encodeURI(
                         `OAuth oauth_consumer_key="${oauth_data.oauth_consumer_key}",` +
-                        `oauth_signature_method="${oauth_data.oauth_signature_method}",` +
-                        `oauth_timestamp="${oauth_data.oauth_timestamp}",` +
-                        `oauth_nonce="${oauth_data.oauth_nonce}",` +
-                        `oauth_version="${oauth_data.oauth_version}",` +
-                        `oauth_signature="${oauth_data.oauth_signature}"`,
+                            `oauth_signature_method="${oauth_data.oauth_signature_method}",` +
+                            `oauth_timestamp="${oauth_data.oauth_timestamp}",` +
+                            `oauth_nonce="${oauth_data.oauth_nonce}",` +
+                            `oauth_version="${oauth_data.oauth_version}",` +
+                            `oauth_signature="${oauth_data.oauth_signature}" ` +
+                            `oauth_callback=${oauth_callback}`
+                    ),
                 },
-                body: JSON.stringify({ oauth_callback: "https://tempest-client.now.sh/" }),
+                body: JSON.stringify({ oauth_callback }),
             });
 
             res.status(200);
