@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
-    "@now/node": "1.8.4",
+    "@now/node": "1.8.5",
     "@types/crypto-js": "4.0.1",
     "@types/form-urlencoded": "2.0.1",
     "@types/node": "14.11.8",
